@@ -2,19 +2,50 @@
   <div v-loading.fullscreen.lock="fullscreenLoading">
     <div style="display: flex;flex-direction: row;justify-content: start;margin-bottom: 10px">
       <div style="display:flex;flex-direction:row;width: 92%">
-        <div style="width: 250px">
+        <div style="min-width: 250px">
           <el-input
               placeholder="支持患者姓名搜索"
               prefix-icon="el-icon-search"
-              v-model="inputid" style="max-width: 250px">
+              v-model="inputid">
           </el-input>
         </div>
-        <div style="margin-left: 20px">
+        <div style="margin-left: 20px;min-width: 200px">
           <el-button-group>
             <el-button type="primary" @click="search">搜索</el-button>
             <el-button type="primary" icon="el-icon-refresh" @click="refresh"></el-button>
           </el-button-group>
         </div>
+      </div>
+      <div style="width: 8%;justify-content: center">
+        <el-button type="primary" @click="dialogFormVisible=true">添加患者</el-button>
+        <el-dialog title="添加患者" v-model="dialogFormVisible" center width="500px">
+          <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
+            <el-form-item label="患者姓名" label-width="80px" prop="name">
+              <el-input v-model="ruleForm.name" autocomplete="off" style="width: 200px"></el-input>
+            </el-form-item>
+            <el-form-item label="患者年龄" label-width="80px" prop="year">
+              <el-input v-model="ruleForm.year" autocomplete="off" style="width: 200px"></el-input>
+            </el-form-item>
+            <el-form-item label="患者性别" label-width="80px">
+              <el-radio-group v-model="ruleForm.sex">
+                <el-radio label="男"></el-radio>
+                <el-radio label="女"></el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="患者电话" label-width="80px" >
+              <el-input v-model="ruleForm.phone" autocomplete="off" style="width: 200px"></el-input>
+            </el-form-item>
+            <el-form-item label="患者电话" label-width="80px">
+              <el-input type="textarea" autosize v-model="ruleForm.desc"></el-input>
+            </el-form-item>
+          </el-form>
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="dialogFormVisible = false">取 消</el-button>
+              <el-button type="primary" @click="addPatient">确 定</el-button>
+            </span>
+          </template>
+        </el-dialog>
       </div>
     </div>
     <el-row :gutter="20">
@@ -69,6 +100,7 @@ export default {
   data(){
     return {
       fullscreenLoading:false,
+      dialogFormVisible:false,
       tableData:[{
         patientID: 1,
         name: '王小虎',
@@ -76,8 +108,26 @@ export default {
         phone: '15157276075',
         sex: 0,
         pastMedicalHistory: "有病",
-      }]
+      }],
+      ruleForm: {
+        name: '',
+        year: '',
+      },
+      rules:{
+        name: [
+          { required: true, message: '请输入患者姓名', trigger: 'blur' },
+        ],
+        year: [
+          { required: true, message: '请输入患者姓名', trigger: 'blur' },
+        ],
+      }
     }
+  },
+  methods:{
+    addPatient(){
+        this.dialogFormVisible=!this.dialogFormVisible
+        console.log(this.dialogFormVisible)
+    },
   }
 }
 </script>

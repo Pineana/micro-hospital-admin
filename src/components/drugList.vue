@@ -16,6 +16,9 @@
           </el-button-group>
         </div>
       </div>
+      <div style="width: 8%;justify-content: center">
+        <el-button type="primary" @click="addPatient">添加患者</el-button>
+      </div>
     </div>
     <el-row :gutter="20">
       <el-col :span="24">
