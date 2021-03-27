@@ -5,16 +5,30 @@ const instance = axios.create({
     timeout:5000
 })
 
-export function get(url,params){
+export function Get(url,params){
     return instance.get(url,{
         params
     })
 }
 
-export function post(url,params){
+export function Post(url,params){
     return instance.post(url,params,{
         headers:{
-            "Content-Type":"application/x-www-form-urlencoded"
+            "Content-Type":"application/json"
         }
+    },)
+}
+
+export function Put(url,params){
+    return instance.put(url,params,{
+        headers:{
+            "Content-Type":"application/json"
+        }
+    },)
+}
+
+export function Delete(url,params){
+    return instance.delete(url, {
+        params
     },)
 }

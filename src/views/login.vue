@@ -33,6 +33,9 @@
 </template>
 
 <script>
+import {Post} from "@/utils/requests";
+import router from "@/router";
+
 export default {
   name: "login",
   data(){
@@ -67,6 +70,17 @@ export default {
   },
   created() {
   },
+  methods:{
+    submitForm(){
+      Post("/base/login",this.loginForm).then(
+          res=>{
+            if (res.status==200){
+              router.push({name:"layout"})
+            }
+          }
+      )
+    }
+  }
 }
 </script>
 
