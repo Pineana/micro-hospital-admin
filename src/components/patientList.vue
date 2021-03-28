@@ -230,6 +230,7 @@ export default {
     },
     refreshPatientList(){
       this.getPatientList(1,10)
+      this.patientName = ""
     },
     current(index){
       console.log(index)

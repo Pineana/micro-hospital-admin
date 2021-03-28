@@ -229,6 +229,7 @@ export default {
     },
     refreshDrugList(){
       this.getDrugList(1,10)
+      this.drugName = ""
     },
     current(index){
       console.log(index)

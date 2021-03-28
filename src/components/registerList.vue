@@ -11,7 +11,7 @@
         </div>
         <div style="margin-left: 20px;min-width: 200px">
           <el-button-group>
-            <el-button type="primary" @click="searchRegisterByName(0,10)">搜索</el-button>
+            <el-button type="primary" @click="searchRegisterById()">搜索</el-button>
             <el-button type="primary" icon="el-icon-refresh" @click="refreshRegisterList"></el-button>
           </el-button-group>
         </div>
@@ -44,12 +44,14 @@
     <el-row :gutter="20">
       <el-col :span="24">
         <el-table :data="tableData" style="width: 100%">
-          <el-table-column label="挂号ID" prop="id" width="200"></el-table-column>
-          <el-table-column label="患者姓名" prop="patientName" width="250"></el-table-column>
-          <el-table-column align="center" label="患者年龄" prop="patientYear" width="80"></el-table-column>
-          <el-table-column align="center" label="患者电话" prop="patientPhone" width="250"></el-table-column>
-          <el-table-column align="center" label="患者性别" prop="patientSex" width="250"></el-table-column>
-          <el-table-column align="center" label="挂号金额" prop="price" width="200"></el-table-column>
+          <el-table-column label="挂号ID" prop="id" width="100"></el-table-column>
+          <el-table-column label="患者姓名" prop="patientName" width="150"></el-table-column>
+          <el-table-column align="center" label="患者年龄" prop="patientYear" width="100"></el-table-column>
+          <el-table-column align="center" label="患者电话" prop="patientPhone" width="200"></el-table-column>
+          <el-table-column align="center" label="患者性别" prop="patientSex" width="100"></el-table-column>
+          <el-table-column align="center" label="前方排队人数" prop="index" width="100"></el-table-column>
+          <el-table-column align="center" label="大约排队时间" prop="waitTime" width="100"></el-table-column>
+          <el-table-column align="center" label="挂号金额" prop="price" width="100"></el-table-column>
           <el-table-column align="center" label="挂号医生-科室" prop="doctorName" width="200"></el-table-column>
           <el-table-column label="操作">
             <template #default="scope">
@@ -79,7 +81,7 @@
 </template>
 
 <script>
-import {Get,Post,Put,Delete} from "@/utils/requests";
+import {Get,Post,Delete} from "@/utils/requests";
 import { ElMessage } from 'element-plus';
 export default {
   name: 'RegisterList',
@@ -120,24 +122,35 @@ export default {
     getRegisterList(page,size){
       Get("/base/get-register-list",{"page":page,"size":size}).then(
           res=>{
-            console.log(res.data.data.registerList)
-            this.tableData = res.data.data.registerList
+            this.tableData = res.data.data.registerList.map(function (item,index){
+              item.index= (page-1)*10+index+1
+              item.waitTime=((page-1)*10+(index+1)*10).toString()+"分钟"
+              return item
+            })
             this.totalPage = res.data.data.totalNum
           }
       )
     },
-    searchRegisterByName(page,size){
-      Get("/base/query-register",{
-        "name":this.registerId,
-        "page":page,
-        "size":size,
-      }).then(
-          res=>{
-            console.log(res.data)
-            this.tableData=res.data.data.registerList
-            this.totalPage = res.data.data.totalNum
-          }
-      )
+    searchRegisterById(){
+      if (this.registerId!=""){
+        Get("/base/query-register",{
+          "id":this.registerId,
+        }).then(
+            res=>{
+              if (res.data.data.registerList.id==0){
+                this.tableData=[]
+                this.registerId = ""
+                return
+              }
+              res.data.data.registerList.index = res.data.data.beforeNum+1
+              res.data.data.registerList.waitTime = ((res.data.data.beforeNum+1)*10).toString()+"分钟"
+              this.tableData=[res.data.data.registerList]
+              this.registerId = ""
+            }
+        )
+      }else{
+        this.getRegisterList(1,10)
+      }
     },
     addRegister(){
       this.ruleForm.patientId = parseInt(this.ruleForm.patientId)
@@ -155,21 +168,6 @@ export default {
           }
       )
       this.dialogFormVisible=!this.dialogFormVisible
-    },
-    editRegister(){
-      Put("/base/edit-register",this.ruleForm).then(
-          res=>{
-            if (res.status==200){
-              ElMessage.success({
-                message:"编辑挂号成功",
-                type:"success"
-              })
-              this.ruleForm = {}
-              this.getRegisterList(this.pageIndex,10)
-            }
-          }
-      )
-      this.editDialogFormVisible=!this.editDialogFormVisible
     },
     deleteRegister(index,row){
       Delete("/base/delete-register",{"id":row.id}).then(
@@ -197,21 +195,21 @@ export default {
         console.log("no search")
         this.getRegisterList(index,10)
       }else{
-        this.searchRegisterByName(index,10)
+        this.searchRegisterById(index,10)
       }
     },
     prevClick(index){
       if (this.registerId==""){
         this.getRegisterList(index,10)
       }else{
-        this.searchRegisterByName(index,10)
+        this.searchRegisterById(index,10)
       }
     },
     nextClick(index){
       if (this.registerId==""){
         this.getRegisterList(index,10)
       }else{
-        this.searchRegisterByName(index,10)
+        this.searchRegisterById(index,10)
       }
     },
     remoteMethod(query){

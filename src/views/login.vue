@@ -25,7 +25,7 @@
      </div>
      <div class="footer">
        <div class="copyright">
-         Copyright &copy; {{ curYear }} 💖阿文是个coder
+         Copyright &copy; {{ curYear }} 💖
        </div>
      </div>
    </div>
@@ -35,6 +35,7 @@
 <script>
 import {Post} from "@/utils/requests";
 import router from "@/router";
+import { ElMessage } from "element-plus";
 
 export default {
   name: "login",
@@ -69,16 +70,24 @@ export default {
     }
   },
   created() {
+    var time = new Date()
+    this.curYear =  time.getFullYear().toString()+ "-" + time.getMonth().toString() + "-" + time.getDate().toString()
   },
   methods:{
     submitForm(){
       Post("/base/login",this.loginForm).then(
           res=>{
             if (res.status==200){
+              ElMessage.success({
+                message:"登陆成功",
+                type:"success"
+              })
               router.push({name:"layout"})
             }
           }
-      )
+      ).catch(function (){
+        ElMessage.error('账号或者密码错误')
+      })
     }
   }
 }
